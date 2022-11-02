@@ -5,7 +5,7 @@
 This project was done to complete an automation assignment for testing a scenario which includes REST requests and web browser testing.
 More details of the scenario and its background can be found here, as well as the .jar file to download and run locally - https://github.com/strengthandwill/oppenheimer-project-dev
 
-For scripting the automated test cases, we use python as our programming language of choice and mainly used RobotFramework - https://robotframework.org/
+For scripting the automated test cases, I had used python as my programming language of choice and mainly used RobotFramework - https://robotframework.org/
 The test cases mainly covered functional testing due to a lack of capacity, but should also ideally cover non-functional scenarios like load and stress testing which will be elaborated further down this document
 
 
@@ -40,19 +40,19 @@ After running the test cases, you can review all the test cases ran in the log.h
 
 ## Improvements
 ### Non-functional testing
-Ideally, we should also conduct non-functional testing on both the REST requests and the web pages to evaluate performance.
+Ideally, non-functional testing should be done on both the REST requests and the web pages to evaluate performance.
 
-For REST requests, we can use SoapUI to run concurrent threads to test multiple calls to each REST request to evaluate how well it performs under load and measure any deterioration in response times.
+For REST requests, SoapUI can be used to run concurrent threads to test multiple calls to each REST request to evaluate how well it performs under load and measure any deterioration in response times.
 For the context of this project, having 10 threads calling each service 5 times a second should suffice as it is unlikely that it will be under heavy load as a non-commercial service
 
 ### Logging
-Although we have mentioned the built-in logging by PyCharm above, it would be better and IDE agnostic to include a more robust logging framework such as Allure. This would allow us to generate reports regardless of where we run the tests and could support a larger range of users
+Although I have mentioned the built-in logging by PyCharm above, it would be better and IDE agnostic to include a more robust logging framework such as Allure. This would allow us to generate reports regardless of where we run the tests and could support a larger range of users
 
 ### TestData
-Currently, test data is being created manually and stored locally either within the codebase or on local machine. In an ideal scenario, we could create Python classes that could generate the data appropriately for both valid and invalid test cases on demand and remove the need to have test data stored in a disorderly manner
+Currently, test data is being created manually and stored locally either within the codebase or on local machine. In an ideal scenario, I could create Python classes that could generate the data appropriately for both valid and invalid test cases on demand and remove the need to have test data stored in a disorderly manner
 
 ### Test cleanup
-In many of the testcase, the validations and data manipulation would seem to be rather large chunks and repetitive. Given enough time, it would be good practise to store validations and formulas in keywords/classes to reduce the mess and keep the code more concise
+In many of the testcases, the validations and data manipulation would seem to be rather large chunks and repetitive. Given enough time, it would be good practise to store validations and formulas in keywords/classes to reduce the mess and keep the code more concise
 
 
 ## Packages and versions
