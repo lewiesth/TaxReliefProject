@@ -11,7 +11,7 @@ ${base_url}=    http://localhost:8080
 *** Test Cases ***
 TC_12:Insert_Single_Person_INVALID_LogicalErrorTaxHigherThanSalary
     [Documentation]     The REST request should be able to identify an anomalous data in that the tax a person paid should not be higher than salary earned
-    [Tags]  Functional  Logical
+    [Tags]  Functional
     Create Session    session    ${base_url}
     ${body}=    Create Dictionary   birthday=17061995    gender=M   name=Lewies     natid=s9520789h     salary=4000     tax=40000
     ${header}=      Create Dictionary   Content-Type=application/json

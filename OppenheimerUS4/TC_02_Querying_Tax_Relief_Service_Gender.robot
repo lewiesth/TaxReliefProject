@@ -8,18 +8,10 @@ Test Teardown   POST On Session     session     /calculator/rakeDatabase
 *** Variables ***
 ${base_url}=    http://localhost:8080
 
-*** Test Cases ***
-TC_02:Querying_Tax_Relief_Service_Gender
-    [Tags]  Functional  Smoke
-    Create Session    session    ${base_url}
-    ${list}=    Create List
-    ${list2}=   Create List
-    ${body1}=    Create Dictionary   birthday=17012003    gender=F   name=TesterA     natid=s12345678a     salary=8000     tax=2000
-    Append To List    ${list}   ${body1}
-    ${body2}=    Create Dictionary   birthday=17012003    gender=M   name=TesterB     natid=s23456789b     salary=8000     tax=2000
-    Append To List    ${list}   ${body2}
-
-    FOR     ${item}     IN      @{list}
+*** Keywords ***
+Calculate Tax Relief
+    [Arguments]     ${listOfTaxpayers}      ${secondList}
+    FOR     ${item}     IN      @{listOfTaxpayers}
         ${item_salary}=      Get From Dictionary     ${item}     salary
         ${item_tax}=        Get From Dictionary     ${item}     tax
         ${item_birthday}=        Get From Dictionary     ${item}     birthday
@@ -56,17 +48,12 @@ TC_02:Querying_Tax_Relief_Service_Gender
         END
 
         ${body_list2}=  Create Dictionary   name=${item_name}   natid=${item_natid}     tax_relief=${Tax_Relief}
-        Append To List  ${list2}    ${body_list2}
+        Append To List  ${secondList}    ${body_list2}
     END
-
-
-    ${header}=      Create Dictionary   Content-Type=application/json
-    ${response}=    POST On Session    session    /calculator/insertMultiple  json=${list}    headers=${header}
-
-    ${response_taxrelief}=      Get On Session     session     /calculator/taxRelief
-    ${response_taxrelief_body}=     Convert To String    ${response_taxrelief.content}
-
-    FOR     ${item2}     IN      @{list2}
+    
+Masking Natid and Validation
+    [Arguments]     ${ListOfTaxrelief}      ${responsebody}
+    FOR     ${item2}     IN      @{ListOfTaxrelief}
         ${item2_name}=   Get From Dictionary     ${item2}     name
         ${item2_taxrelief}=   Get From Dictionary     ${item2}     tax_relief
         ${item2_natid}=   Get From Dictionary     ${item2}     natid
@@ -81,9 +68,29 @@ TC_02:Querying_Tax_Relief_Service_Gender
         ${hidden_natid}=    Catenate    SEPARATOR=  ${visible_natid}    ${hidden_characters}
 
         ${item2_taxrelief_string}=  Convert To String    ${item2_taxrelief}
-        Should Contain    ${response_taxrelief_body}    ${hidden_natid}
-        Should Contain    ${response_taxrelief_body}    ${item2_taxrelief_string}
-        Should Contain    ${response_taxrelief_body}    ${item2_name}
+        Should Contain    ${responsebody}    ${hidden_natid}
+        Should Contain    ${responsebody}     ${item2_taxrelief_string}
+        Should Contain    ${responsebody}     ${item2_name}
+        Log To Console    "Done"
     END
 
+*** Test Cases ***
+TC_02:Querying_Tax_Relief_Service_Gender
+    [Tags]  Functional  Smoke
+    Create Session    session    ${base_url}
+    ${list}=    Create List
+    ${list2}=   Create List
+    ${body1}=    Create Dictionary   birthday=17012003    gender=F   name=TesterA     natid=s12345678a     salary=8000     tax=2000
+    Append To List    ${list}   ${body1}
+    ${body2}=    Create Dictionary   birthday=17012003    gender=M   name=TesterB     natid=s23456789b     salary=8000     tax=2000
+    Append To List    ${list}   ${body2}
 
+    Calculate Tax Relief    ${list}     ${list2}
+
+    ${header}=      Create Dictionary   Content-Type=application/json
+    ${response}=    POST On Session    session    /calculator/insertMultiple  json=${list}    headers=${header}
+
+    ${response_taxrelief}=      Get On Session     session     /calculator/taxRelief
+    ${response_taxrelief_body}=     Convert To String    ${response_taxrelief.content}
+    
+    Masking Natid and Validation    ${list2}    ${response_taxrelief_body}

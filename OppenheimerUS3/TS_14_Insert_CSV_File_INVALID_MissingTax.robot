@@ -19,7 +19,7 @@ TC_14_1:Upload_Files_INVALID_MissingTaxChrome
     Create Session    session    ${base_url}
     Open Browser    http://localhost:8080/     Chrome
     Wait Until Element Is Visible    xpath:/html/body/div/div[2]/div/div[1]/div[2]      timeout=5
-    Choose File    xpath:/html/body/div/div[2]/div/div[1]/div[2]/input    C:/Users/lewie/Desktop/TestData/InputDataInvalidMissingTax.csv
+    Choose File    xpath:/html/body/div/div[2]/div/div[1]/div[2]/input    C:/Users/ECQ1046/PycharmProjects/TaxReliefProject/OppenheimerUS3/TestData/InputDataInvalidMissingTax.csv
     Click Button    xpath:/html/body/div/div[2]/div/button[1]
     ${No_Records_Message}=      Get Text     xpath:/html/body/div/div[2]/div/h1
 
@@ -31,7 +31,7 @@ TC_14_2:Upload_Files_INVALID_MissingTaxFirefox
     Create Session    session    ${base_url}
     Open Browser    http://localhost:8080/     Firefox
     Wait Until Element Is Visible    xpath:/html/body/div/div[2]/div/div[1]/div[2]      timeout=5
-    Choose File    xpath:/html/body/div/div[2]/div/div[1]/div[2]/input    C:\\Users\\lewie\\Desktop\\TestData\\InputDataInvalidMissingTax.csv
+    Choose File    xpath:/html/body/div/div[2]/div/div[1]/div[2]/input    C:\\Users\\ECQ1046\\PycharmProjects\\TaxReliefProject\\OppenheimerUS3\\TestData\\InputDataInvalidMissingTax.csv
     Click Button    xpath:/html/body/div/div[2]/div/button[1]
     ${No_Records_Message}=      Get Text     xpath:/html/body/div/div[2]/div/h1
 
@@ -43,7 +43,7 @@ TC_14_3:Upload_Files_INVALID_MissingTaxEdge
     Create Session    session    ${base_url}
     Open Browser    http://localhost:8080/     edge
     Wait Until Element Is Visible    xpath:/html/body/div/div[2]/div/div[1]/div[2]      timeout=5
-    Choose File    xpath:/html/body/div/div[2]/div/div[1]/div[2]/input    C:/Users/lewie/Desktop/TestData/InputDataInvalidMissingTax.csv
+    Choose File    xpath:/html/body/div/div[2]/div/div[1]/div[2]/input    C:/Users/ECQ1046/PycharmProjects/TaxReliefProject/OppenheimerUS3/TestData/InputDataInvalidMissingTax.csv
     Click Button    xpath:/html/body/div/div[2]/div/button[1]
     ${No_Records_Message}=      Get Text     xpath:/html/body/div/div[2]/div/h1
 

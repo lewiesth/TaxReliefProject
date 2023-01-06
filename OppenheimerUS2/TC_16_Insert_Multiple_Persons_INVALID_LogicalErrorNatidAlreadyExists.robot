@@ -11,7 +11,7 @@ ${base_url}=    http://localhost:8080
 *** Test Cases ***
 TC_16:Insert_Multiple_Persons_INVALID_LogicalErrorNatidAlreadyExists
     [Documentation]     The REST request should be able to identify that a particular record already exists in the table, ideally using natid. It should then throw a warning or refuse the request
-    [Tags]  Functional  Logical
+    [Tags]  Functional
     Create Session    session    ${base_url}
     ${list}=    Create List
     ${body1}=    Create Dictionary   birthday=17061995    gender=M   name=Lewies     natid=s12345678h     salary=4000     tax=400

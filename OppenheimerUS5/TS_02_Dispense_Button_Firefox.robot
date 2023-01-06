@@ -17,7 +17,7 @@ Teardown
     Close Browser
 
 *** Test Cases ***
-TC_02_01:Dispense_Button_CheckColorFirefox
+TC_02:Dispense_Button_CheckColorFirefox
     [Tags]  Functional  Smoke   Portability-FF
     Create Session    session    ${base_url}
     Open Browser    http://localhost:8080/     Firefox
@@ -34,20 +34,9 @@ TC_02_01:Dispense_Button_CheckColorFirefox
 
     Should Be True    (${color_r}<=255 and ${color_r}>=160) and (${color_b}<=75 and ${color_b}>=0) and (${color_g}<=75 and ${color_g}>=0)
 
-TC_02_02:Dispense_Button_CheckTextFirefox
-    [Tags]  Functional  Smoke   Portability-FF
-    Create Session    session    ${base_url}
-    Open Browser    http://localhost:8080/     Firefox
-    Wait Until Element Is Visible    xpath:/html/body/div/div[2]/div/a[2]      timeout=5
-    ${button_element}=  Get WebElement   xpath=/html/body/div/div[2]/div/a[2]
     ${button_element_text}=     Set Variable    ${button_element.text}
     Should Be Equal    ${button_element_text}    Dispense Now
 
-TC_02_03:Dispense_Button_ClickAndDivertFirefox
-    [Tags]  Functional  Smoke   Portability-FF
-    Create Session    session    ${base_url}
-    Open Browser    http://localhost:8080/     Firefox
-    Wait Until Element Is Visible    xpath:/html/body/div/div[2]/div/a[2]      timeout=5
     Click Element    xpath:/html/body/div/div[2]/div/a[2]
     Wait Until Element Is Visible    xpath:/html/body/div/div/div/main/div/div/div  timeout=5
     ${text_element}=    Get WebElement    xpath:/html/body/div/div/div/main/div/div/div

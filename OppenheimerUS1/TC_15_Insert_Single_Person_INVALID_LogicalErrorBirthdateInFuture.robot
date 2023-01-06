@@ -11,7 +11,7 @@ ${base_url}=    http://localhost:8080
 *** Test Cases ***
 TC_15:Insert_Single_Person_INVALID_LogicalErrorBirthdateInFuture
     [Documentation]     The REST request should be able to identify invalid birthdates such as those in the future or in very recent years
-    [Tags]  Functional  Logical
+    [Tags]  Functional
     Create Session    session    ${base_url}
     ${body}=    Create Dictionary   birthday=17062030    gender=M   name=Lewies     natid=s9520789h     salary=4000     tax=300
     ${header}=      Create Dictionary   Content-Type=application/json
