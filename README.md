@@ -98,7 +98,9 @@ Python - 3.11.1
 
 ### Testing tags
 | Functional | Smoke | Portability-C | Portability-FF | Portability-E |
+
 Tags are used to run tests based on their categories. For running all test cases, tags should be omitted in the command as instructued in How to run section of this read me.
+
 Functional - Run tests that are deemed to be testing functional capabilities of the testware
 Smoke - Run tests on the critical functionality of the testware. Can be considered a subset of functional tests to be run when time is tight
 Portability - Run tests to check useability of testware on different platforms, especially for web testing. Portability-C/FF/E refers to Chrome/FireFox and Edge respectively
