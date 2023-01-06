@@ -75,7 +75,7 @@ Allure has been added into this project as a test report tool to support better 
 ## Packages and versions
 | Packages | Versions |
 | -------- | -------- |
-| robotframwork | 6.0.1 |
+| robotframework | 6.0.1 |
 | robotframework-requests | 0.9.4 |
 | robotframework-jsonlibrary | 0.5 |
 | robotframework-seleniumlibrary | 6.0.0 |
