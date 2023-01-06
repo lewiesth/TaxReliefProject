@@ -38,6 +38,29 @@ robot -e smoke .\OppenheimerUS1
 
 After running the test cases, you can review all the test cases ran in the log.html file under venv with Right-click -> Open in -> Browser -> Chrome
 
+To utilise allure reporting, run the allure-robot listener in conjunction with the robot commands above
+
+```
+
+# Runs allure-robotframework listener with robot for sub-directory OppenheimerUS1
+robot --listener allure_robotframework ./OppenheimerUS1/
+
+```
+
+After running the above command, allure creates a directory in your project under ./output/allure which contains the json output files.
+You can either access the allure report using the json files, or create an index.html file and accessing it using Right-click -> Open in -> Browser -> Chrome
+
+```
+
+#Creates and directs you to the allure report that is hosted locally
+#It stops working if you cancel the terminal process
+allure serve {ProjectDirectory}\TaxReliefProject\output\allure
+
+#Creates an folder under Project Directory named allure-report with reporting data and index.html file
+allure generate {ProjectDirectory}\TaxReliefProject\output\allure
+
+```
+
 ## Improvements
 ### Non-functional testing
 Ideally, non-functional testing should be done on both the REST requests and the web pages to evaluate performance.
@@ -46,7 +69,7 @@ For REST requests, SoapUI can be used to run concurrent threads to test multiple
 For the context of this project, having 10 threads calling each service 5 times a second should suffice as it is unlikely that it will be under heavy load as a non-commercial service
 
 ### Logging
-Although I have mentioned the built-in logging by PyCharm above, it would be better and IDE agnostic to include a more robust logging framework such as Allure. This would allow us to generate reports regardless of where we run the tests and could support a larger range of users
+Allure has been added into this project as a test report tool to support better user readability and make it more intuitive to understand test results. However, due to the nature of allure-robotframework, it can be clunky as the results can only be viewed when having the allure output files from running the test cases which can be in large numbers and difficult to share results between machines. It would be better if the reports could be stored and distributed as a standalone file, which could be possible with allure integration with docker containers.
 
 ### TestData
 Currently, test data is being created manually and stored locally either within the codebase or on local machine. In an ideal scenario, I could create Python classes that could generate the data appropriately for both valid and invalid test cases on demand and remove the need to have test data stored in a disorderly manner
@@ -58,25 +81,35 @@ In many of the testcases, the validations and data manipulation would seem to be
 ## Packages and versions
 | Packages | Versions |
 | -------- | -------- |
-| robotframwork | 6 |
+| robotframwork | 6.0.1 |
 | robotframework-requests | 0.9.4 |
 | robotframework-jsonlibrary | 0.5 |
 | robotframework-seleniumlibrary | 6.0.0 |
 | requests | 2.28.1 |
+| allure-robotframework | 2.12.0 |
 
 | WebDrivers | Versions |
 | ---------- | -------- |
-| Chrome | 106.0.5249.61 |
+| Chrome | 108.0.5359.71 |
 | Gecko | 0.32.0 |
-| Edge | 106.0.1370.52 |
+| Edge | 108.0.1462.54 |
 
-Python - 3.11.0
+Python - 3.11.1
 
 ### Testing tags
-| Functional | Smoke | Logical | Portability-C | Portability-FF | Portability-E |
+| Functional | Smoke | Portability-C | Portability-FF | Portability-E |
 
+Tags are used to run tests based on their categories. For running all test cases, tags should be omitted in the command as instructued in How to run section of this read me.
+
+Functional - Run tests that are deemed to be testing functional capabilities of the testware
+Smoke - Run tests on the critical functionality of the testware. Can be considered a subset of functional tests to be run when time is tight
+Portability - Run tests to check useability of testware on different platforms, especially for web testing. Portability-C/FF/E refers to Chrome/FireFox and Edge respectively
 
 ## Attached project charter that gives an overview of the tests conducted
-### Total tests done - 100
-### Tests Passed - 73
+### Total tests done - 94
+### Tests Passed - 67
 ### Tests Failed - 27
+
+![ResultsAllureSnapshot](https://user-images.githubusercontent.com/44538479/210918022-2a8a1fe4-0368-40f4-a216-3a23dc84a526.PNG)
+
+To explore the results further using allure reporting tool, ensure you have followed the instructions on running allure under the How to run section. Alternatively, you can download the allure report folder, and run index.html in the browser of your choice.
