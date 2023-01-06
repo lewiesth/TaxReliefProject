@@ -113,3 +113,4 @@ Portability - Run tests to check useability of testware on different platforms, 
 ![ResultsAllureSnapshot](https://user-images.githubusercontent.com/44538479/210918022-2a8a1fe4-0368-40f4-a216-3a23dc84a526.PNG)
 
 To explore the results further using allure reporting tool, ensure you have followed the instructions on running allure under the How to run section. 
+Refer to Testing Documentation.xlsx for test charter details, including test description, test steps, input data and comments regarding test case failing
