@@ -71,12 +71,6 @@ For the context of this project, having 10 threads calling each service 5 times 
 ### Logging
 Allure has been added into this project as a test report tool to support better user readability and make it more intuitive to understand test results. However, due to the nature of allure-robotframework, it can be clunky as the results can only be viewed when having the allure output files from running the test cases which can be in large numbers and difficult to share results between machines. It would be better if the reports could be stored and distributed as a standalone file, which could be possible with allure integration with docker containers.
 
-### TestData
-Currently, test data is being created manually and stored locally either within the codebase or on local machine. In an ideal scenario, I could create Python classes that could generate the data appropriately for both valid and invalid test cases on demand and remove the need to have test data stored in a disorderly manner
-
-### Test cleanup
-In many of the testcases, the validations and data manipulation would seem to be rather large chunks and repetitive. Given enough time, it would be good practise to store validations and formulas in keywords/classes to reduce the mess and keep the code more concise
-
 
 ## Packages and versions
 | Packages | Versions |
