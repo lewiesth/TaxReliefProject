@@ -38,7 +38,7 @@ robot -e smoke .\OppenheimerUS1
 
 After running the test cases, you can review all the test cases ran in the log.html file under venv with Right-click -> Open in -> Browser -> Chrome
 
-To utilise allure reporting, run the allure-robot listener in conjunction with the robot commands above
+To utilise allure reporting, run the allure-robot listener in conjunction with the robot commands above. You need to have allure commandline application downloaded and your system variable PATH set to the downloaded .bin file to run allure. Step by step instructions can be found here https://docs.qameta.io/allure/
 
 ```
 
