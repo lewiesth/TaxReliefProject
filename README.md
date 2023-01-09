@@ -71,6 +71,13 @@ For the context of this project, having 10 threads calling each service 5 times 
 ### Logging
 Allure has been added into this project as a test report tool to support better user readability and make it more intuitive to understand test results. However, due to the nature of allure-robotframework, it can be clunky as the results can only be viewed when having the allure output files from running the test cases which can be in large numbers and difficult to share results between machines. It would be better if the reports could be stored and distributed as a standalone file, which could be possible with allure integration with docker containers.
 
+### Reuseability of code
+To accomodate a large range of data inputs for the same test scenario, I had used the Template keyword in Userstory 4 to reuse testcases and format code in a readable format. While this makes the code easier to read and more efficient to run, it has the downside of being hard to pinpoint any failures in test scenarios. Should a single data input cause a Failed scenario, the entire suite of test data is considered to have failed and may consume more capacity in diagnosing the root cause.
+
+It may then be more prudent to seperate test input data to individual test cases as done in Userstory 1 and 2, such that any failures can be easily identified and handled. It would be up to the individual and their team to determine the appropriate approach to code reuseability.
+
+### Service improvements
+The webservice for both UI and API usecases can be further refined to be more robust and resilient to handle a larger range of input data and datatypes. Suggestions and defects identified can be found in the Testing Documentation.xlsx file for more information, but largely consists of having constraints regarding range of data and datatypes.
 
 ## Packages and versions
 | Packages | Versions |
@@ -97,14 +104,15 @@ Tags are used to run tests based on their categories. For running all test cases
 
 Functional - Run tests that are deemed to be testing functional capabilities of the testware
 Smoke - Run tests on the critical functionality of the testware. Can be considered a subset of functional tests to be run when time is tight
-Portability - Run tests to check useability of testware on different platforms, especially for web testing. Portability-C/FF/E refers to Chrome/FireFox and Edge respectively
+Portability - Run tests to check useability of testware on different platforms, especially for web testing. Portability-C/FF/E refers to Chrome/FireFox/Edge respectively
 
 ## Attached project charter that gives an overview of the tests conducted
-### Total tests done - 94
-### Tests Passed - 67
-### Tests Failed - 27
+### Total tests done - 90
+### Tests Passed - 60
+### Tests Failed - 30
 
-![ResultsAllureSnapshot](https://user-images.githubusercontent.com/44538479/210918022-2a8a1fe4-0368-40f4-a216-3a23dc84a526.PNG)
+
+![Allure report snapshot 9Jan](https://user-images.githubusercontent.com/44538479/211273452-85fad899-3d7e-40f7-894c-f6b332251d17.PNG)
 
 To explore the results further using allure reporting tool, ensure you have followed the instructions on running allure under the How to run section. 
 
