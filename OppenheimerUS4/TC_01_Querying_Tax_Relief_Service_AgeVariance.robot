@@ -2,13 +2,48 @@
 Library     RequestsLibrary
 Library     Collections
 Library     String
+Library    SeleniumLibrary
 
 Test Teardown   POST On Session     session     /calculator/rakeDatabase
 
 *** Variables ***
 ${base_url}=    http://localhost:8080
+${endpoint}=    /calculator/insertMultiple
+${endpoint_taxrelief}=  /calculator/taxRelief
+${teardown_rake}=   /calculator/rakeDatabase
+
+#${birthday}=  01012007
+${gender}=  M
+${name}=    Lewies
+${natid}=   s1234567a
+${salary}=  10000
+${tax}=     1000
+${natid_error}=     Natid has failed validation
+${taxrelief_error}=    TaxRelief has failed validation
+${name_error}=      Name has failed validation
 
 *** Keywords ***
+Age Variable
+    [Arguments]     ${Comment}     ${birthday}      ${gender}   ${name}     ${natid}    ${salary}   ${tax}        ${Expected_Status_Code}
+    Create Session    session    ${base_url}
+    ${list}=    Create List
+    ${list2}=   Create List
+    ${body1}=    Create Dictionary   birthday=${birthday}     gender=${gender}   name=${name}      natid=${natid}     salary=${salary}     tax=${tax}
+    Append To List    ${list}   ${body1}
+
+    Calculate Tax Relief    ${list}     ${list2}
+
+    ${header}=      Create Dictionary   Content-Type=application/json
+    ${response}=    POST On Session    session    /calculator/insertMultiple  json=${list}    headers=${header}
+    ${status_code}=     convert to string   ${response.status_code}
+    Should Be Equal    ${status_code}    ${Expected_Status_Code}    msg=Invalid status code. Expected ${Expected_Status_Code}
+
+    ${response_taxrelief}=      Get On Session     session     ${endpoint_taxrelief}
+
+    POST On Session     session     ${teardown_rake}
+
+    Masking Natid and Validation    ${list2}    ${response_taxrelief}
+
 Calculate Tax Relief
     [Arguments]     ${listOfTaxpayers}      ${secondList}
     FOR     ${item}     IN      @{listOfTaxpayers}
@@ -20,7 +55,8 @@ Calculate Tax Relief
         ${item_natid}=      Get From Dictionary     ${item}     natid
 
         ${item_birthyear}=      Get Substring   ${item_birthday}    -4
-        ${item_age}=        Evaluate    2022-${item_birthyear}
+
+        ${item_age}=        Evaluate    2023-${item_birthyear}
 
         IF  "${item_gender}"=="M"
             ${gender_bonus}=    Set Variable    0
@@ -41,7 +77,7 @@ Calculate Tax Relief
         END
 
         ${Tax_Relief}=      Evaluate    int((((${item_salary}-${item_tax})*${age_variable})+${gender_bonus})*100)/100.0
-        ${Tax_Relief}=      Evaluate    round(${Tax_Relief})
+        ${Tax_Relief}=      Evaluate    "%.2f" %round(${Tax_Relief})
 
         IF  ${Tax_Relief}>0 and ${Tax_Relief}<50
             ${Tax_Relief}=  Set Variable    50
@@ -68,106 +104,29 @@ Masking Natid and Validation
         ${hidden_natid}=    Catenate    SEPARATOR=  ${visible_natid}    ${hidden_characters}
 
         ${item2_taxrelief_string}=  Convert To String    ${item2_taxrelief}
-        Should Contain    ${responsebody}    ${hidden_natid}
-        Should Contain    ${responsebody}     ${item2_taxrelief_string}
-        Should Contain    ${responsebody}     ${item2_name}
+
+        ${responsebody_contents}=    Evaluate    json.loads('''${responsebody.content}''')    json
+        ${responsebody_content}=     Copy Dictionary    ${responsebody_contents}[0]
+
+        Should Be Equal    ${responsebody_content}[natid]    ${hidden_natid}    msg=${natid_error}
+        Should Be Equal    ${responsebody_content}[relief]     ${item2_taxrelief_string}     msg=${taxrelief_error}
+        Should Be Equal    ${responsebody_content}[name]     ${item2_name}     msg=${name_error}
     END
 
 *** Test Cases ***
-TS_01_1:Querying_Tax_Relief_Service_AgeVariance_UpTo18
-    [Documentation]     The tests in this directory are to validate that the data are properly parsed in accordance to specification
-    [Tags]  Functional  Smoke
-    Create Session    session    ${base_url}
-    ${list}=    Create List
-    ${list2}=   Create List
-    ${body1}=    Create Dictionary   birthday=17012004    gender=F   name=TesterA     natid=s12345678a     salary=8000     tax=2000
-    Append To List    ${list}   ${body1}
-
-    Calculate Tax Relief    ${list}     ${list2}
-
-    ${header}=      Create Dictionary   Content-Type=application/json
-    ${response}=    POST On Session    session    /calculator/insertMultiple  json=${list}    headers=${header}
-
-    ${response_taxrelief}=      Get On Session     session     /calculator/taxRelief
-    ${response_taxrelief_body}=     Convert To String    ${response_taxrelief.content}
-    
-    Masking Natid and Validation    ${list2}    ${response_taxrelief_body}
-
-TS_01_2:Querying_Tax_Relief_Service_AgeVariance_18To35
-    [Tags]  Functional  Smoke
-    Create Session    session    ${base_url}
-    ${list}=    Create List
-    ${list2}=   Create List
-    ${body2}=    Create Dictionary   birthday=17012003    gender=F   name=TesterB     natid=s23456789b     salary=8000     tax=2000
-    Append To List    ${list}   ${body2}
-    ${body3}=    Create Dictionary   birthday=17011987    gender=F   name=TesterC     natid=s34567890c     salary=8000     tax=2000
-    Append To List    ${list}   ${body3}
-
-    Calculate Tax Relief    ${list}     ${list2}
-
-    ${header}=      Create Dictionary   Content-Type=application/json
-    ${response}=    POST On Session    session    /calculator/insertMultiple  json=${list}    headers=${header}
-
-    ${response_taxrelief}=      Get On Session     session     /calculator/taxRelief
-    ${response_taxrelief_body}=     Convert To String    ${response_taxrelief.content}
-
-    Masking Natid and Validation    ${list2}    ${response_taxrelief_body}
-
-TS_01_3:Querying_Tax_Relief_Service_AgeVariance_35To50
-    [Tags]  Functional  Smoke
-    Create Session    session    ${base_url}
-    ${list}=    Create List
-    ${list2}=   Create List
-    ${body4}=    Create Dictionary   birthday=17011986    gender=F   name=TesterD     natid=s45678901d     salary=8000     tax=2000
-    Append To List    ${list}   ${body4}
-    ${body5}=    Create Dictionary   birthday=17011972    gender=F   name=TesterE     natid=s56789012e     salary=8000     tax=2000
-    Append To List    ${list}   ${body5}
-
-    Calculate Tax Relief    ${list}     ${list2}
-
-    ${header}=      Create Dictionary   Content-Type=application/json
-    ${response}=    POST On Session    session    /calculator/insertMultiple  json=${list}    headers=${header}
-
-    ${response_taxrelief}=      Get On Session     session     /calculator/taxRelief
-    ${response_taxrelief_body}=     Convert To String    ${response_taxrelief.content}
-
-    Masking Natid and Validation    ${list2}    ${response_taxrelief_body}
-
-TS_01_4:Querying_Tax_Relief_Service_AgeVariance_51To75
-    [Tags]  Functional  Smoke
-    Create Session    session    ${base_url}
-    ${list}=    Create List
-    ${list2}=   Create List
-    ${body6}=    Create Dictionary   birthday=17011971    gender=F   name=TesterF     natid=s67890123f     salary=8000     tax=2000
-    Append To List    ${list}   ${body6}
-    ${body7}=    Create Dictionary   birthday=17011947    gender=F   name=TesterG     natid=s78901234g     salary=8000     tax=2000
-    Append To List    ${list}   ${body7}
-
-    Calculate Tax Relief    ${list}     ${list2}
-
-    ${header}=      Create Dictionary   Content-Type=application/json
-    ${response}=    POST On Session    session    /calculator/insertMultiple  json=${list}    headers=${header}
-
-    ${response_taxrelief}=      Get On Session     session     /calculator/taxRelief
-    ${response_taxrelief_body}=     Convert To String    ${response_taxrelief.content}
-
-
-    Masking Natid and Validation    ${list2}    ${response_taxrelief_body}
-
-TS_01_5:Querying_Tax_Relief_Service_AgeVariance_Above75
-    [Tags]  Functional  Smoke
-    Create Session    session    ${base_url}
-    ${list}=    Create List
-    ${list2}=   Create List
-    ${body8}=    Create Dictionary   birthday=17011946    gender=F   name=TesterH     natid=s89012345h     salary=8000     tax=2000
-    Append To List    ${list}   ${body8}
-
-    Calculate Tax Relief    ${list}     ${list2}
-
-    ${header}=      Create Dictionary   Content-Type=application/json
-    ${response}=    POST On Session    session    /calculator/insertMultiple  json=${list}    headers=${header}
-
-    ${response_taxrelief}=      Get On Session     session     /calculator/taxRelief
-    ${response_taxrelief_body}=     Convert To String    ${response_taxrelief.content}
-
-    Masking Natid and Validation    ${list2}    ${response_taxrelief_body}
+Tax Relief Formula Age Variable
+    [Template]  Age Variable
+    --Test when age = 18   01012005    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    202
+    --Test when age = 19   01012004    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    202
+    --Test when age = 35   01011988    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    202
+    --Test when age = 36   01011987    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    202
+    --Test when age = 50   01011973    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    202
+    --Test when age = 51   01011972    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    202
+    --Test when age = 75   01011948    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    202
+    --Test when age = 76   01011947    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    202
+    --Test when age = 1   01012022    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    500
+    --Test when age = -1   01012024    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    500
+    --Test when age = 150   01011873    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    500
+    --Test when age is characters   abcdef    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    500
+    --Test when age is special characters   !@#$%^    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    500
+    --Test when age format is invalid   20050101    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    500

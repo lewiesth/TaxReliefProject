@@ -7,8 +7,43 @@ Test Teardown   POST On Session     session     /calculator/rakeDatabase
 
 *** Variables ***
 ${base_url}=    http://localhost:8080
+${endpoint}=    /calculator/insertMultiple
+${endpoint_taxrelief}=  /calculator/taxRelief
+${teardown_rake}=   /calculator/rakeDatabase
+
+${birthday}=  01012007
+${gender}=  M
+${name}=    Lewies
+${natid}=   s1234567a
+${salary}=  10000
+#${tax}=     1000
+${natid_error}=     Natid has failed validation
+${taxrelief_error}=    TaxRelief has failed validation
+${name_error}=      Name has failed validation
 
 *** Keywords ***
+Minimum Tax Relief
+    [Arguments]     ${Comment}     ${birthday}      ${gender}   ${name}     ${natid}    ${salary}   ${tax}  ${expected_relief_min}  ${Expected_Status_Code}
+    Create Session    session    ${base_url}
+    ${list}=    Create List
+    ${list2}=   Create List
+    ${body1}=    Create Dictionary   birthday=${birthday}     gender=${gender}   name=${name}      natid=${natid}     salary=${salary}     tax=${tax}
+    Append To List    ${list}   ${body1}
+
+    Calculate Tax Relief    ${list}     ${list2}
+
+    ${header}=      Create Dictionary   Content-Type=application/json
+    ${response}=    POST On Session    session    ${endpoint}  json=${list}    headers=${header}
+
+    ${status_code}=     convert to string   ${response.status_code}
+    Should Be Equal    ${status_code}    ${Expected_Status_Code}    msg=Invalid status code. Expected ${Expected_Status_Code}
+
+    ${response_taxrelief}=      Get On Session     session     ${endpoint_taxrelief}
+
+    POST On Session     session     ${teardown_rake}
+
+    Masking Natid and Validation    ${list2}    ${response_taxrelief}      ${expected_relief_min}
+
 Calculate Tax Relief
     [Arguments]     ${listOfTaxpayers}      ${secondList}
     FOR     ${item}     IN      @{listOfTaxpayers}
@@ -41,7 +76,7 @@ Calculate Tax Relief
         END
 
         ${Tax_Relief}=      Evaluate    int((((${item_salary}-${item_tax})*${age_variable})+${gender_bonus})*100)/100.0
-        ${Tax_Relief}=      Evaluate    round(${Tax_Relief})
+        ${Tax_Relief}=      Evaluate    "%.2f" %round(${Tax_Relief})
 
         IF  ${Tax_Relief}>0 and ${Tax_Relief}<50
             ${Tax_Relief}=  Set Variable    50
@@ -52,7 +87,7 @@ Calculate Tax Relief
     END
 
 Masking Natid and Validation
-    [Arguments]     ${ListOfTaxrelief}      ${responsebody}
+    [Arguments]     ${ListOfTaxrelief}      ${responsebody}     ${expected_relief_min}
     FOR     ${item2}     IN      @{ListOfTaxrelief}
         ${item2_name}=   Get From Dictionary     ${item2}     name
         ${item2_taxrelief}=   Get From Dictionary     ${item2}     tax_relief
@@ -68,32 +103,21 @@ Masking Natid and Validation
         ${hidden_natid}=    Catenate    SEPARATOR=  ${visible_natid}    ${hidden_characters}
 
         ${item2_taxrelief_string}=  Convert To String    ${item2_taxrelief}
-        Should Contain    ${responsebody}    ${hidden_natid}
-        Should Contain    ${responsebody}     ${item2_taxrelief_string}
-        Should Contain    ${responsebody}     ${item2_name}
+
+        ${responsebody_contents}=    Evaluate    json.loads('''${responsebody.content}''')    json
+        ${responsebody_content}=     Copy Dictionary    ${responsebody_contents}[0]
+
+        Should Be Equal    ${responsebody_content}[natid]    ${hidden_natid}    msg=${natid_error}
+        Should Be Equal    ${responsebody_content}[relief]     ${expected_relief_min}     msg=${taxrelief_error}
+        Should Be Equal    ${responsebody_content}[name]     ${item2_name}     msg=${name_error}
     END
-    
 
 *** Test Cases ***
-TC_03:Querying_Tax_Relief_Service_Below50Relief
-    [Tags]  Functional  Smoke
-    Create Session    session    ${base_url}
-    ${list}=    Create List
-    ${list2}=   Create List
-    ${body1}=    Create Dictionary   birthday=17012003    gender=M   name=TesterA     natid=s12345678a     salary=316     tax=300
-    Append To List    ${list}   ${body1}
-    ${body2}=    Create Dictionary   birthday=17012003    gender=M   name=TesterB     natid=s23456789b     salary=352     tax=300
-    Append To List    ${list}   ${body2}
-
-    Calculate Tax Relief    ${list}     ${list2}
-
-    ${header}=      Create Dictionary   Content-Type=application/json
-    ${response}=    POST On Session    session    /calculator/insertMultiple  json=${list}    headers=${header}
-
-    ${response_taxrelief}=      Get On Session     session     /calculator/taxRelief
-    ${response_taxrelief_body}=     Convert To String    ${response_taxrelief.content}
-
-    Masking Natid and Validation    ${list2}    ${response_taxrelief_body}
-
-
-
+Tax Relief Formula Minimum Tax Relief
+    [Template]  Minimum Tax Relief
+    --Testing for TaxRelief=0   ${birthday}    ${gender}      ${name}    ${natid}   ${salary}  10000     0.00  202
+    --Testing for TaxRelief=1   ${birthday}    ${gender}      ${name}    ${natid}   ${salary}  9999    50.00    202
+    --Testing for TaxRelief=49   ${birthday}    ${gender}      ${name}    ${natid}   ${salary}  9951     50.00  202
+    --Testing for TaxRelief=50   ${birthday}    ${gender}      ${name}    ${natid}   ${salary}  9950    50.00   202
+    --Testing for TaxRelief=51   ${birthday}    ${gender}      ${name}    ${natid}   ${salary}  9949    51.00   202
+    --Testing for TaxRelief is negative   ${birthday}    ${gender}      ${name}    ${natid}   ${salary}  10001    -1.00   500

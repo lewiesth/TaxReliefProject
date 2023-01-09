@@ -2,13 +2,53 @@
 Library     RequestsLibrary
 Library     Collections
 Library     String
+Library    SeleniumLibrary
 
 Test Teardown   POST On Session     session     /calculator/rakeDatabase
 
 *** Variables ***
 ${base_url}=    http://localhost:8080
+${endpoint}=    /calculator/insertMultiple
+${endpoint_taxrelief}=  /calculator/taxRelief
+${teardown_rake}=   /calculator/rakeDatabase
+
+${birthday}=  01012007
+#${gender}=  M
+${name}=    Lewies
+${natid}=   s1234567a
+${salary}=  10000
+${tax}=     1000
+${natid_error}=     Natid has failed validation
+${taxrelief_error}=    TaxRelief has failed validation
+${name_error}=      Name has failed validation
 
 *** Keywords ***
+Gender Bonus
+    [Arguments]     ${Comment}     ${birthday}      ${gender}   ${name}     ${natid}    ${salary}   ${tax}     ${Expected_Status_Code}
+    Create Session    session    ${base_url}
+    ${list}=    Create List
+    ${list2}=   Create List
+    ${body1}=    Create Dictionary   birthday=${birthday}     gender=${gender}   name=${name}      natid=${natid}     salary=${salary}     tax=${tax}
+    Append To List    ${list}   ${body1}
+
+    Calculate Tax Relief    ${list}     ${list2}
+
+    ${header}=      Create Dictionary   Content-Type=application/json
+    TRY
+        ${response}=    POST On Session    session    ${endpoint}  json=${list}    headers=${header}
+    EXCEPT
+        Log To Console    Failure to send Post request. Invalid gender input
+    END
+
+    ${status_code}=     convert to string   ${response.status_code}
+    Should Be Equal    ${status_code}    ${Expected_Status_Code}    msg=Invalid status code. Expected ${Expected_Status_Code}
+
+    ${response_taxrelief}=      Get On Session     session     ${endpoint_taxrelief}
+
+    POST On Session     session     ${teardown_rake}
+
+    Masking Natid and Validation    ${list2}    ${response_taxrelief}
+
 Calculate Tax Relief
     [Arguments]     ${listOfTaxpayers}      ${secondList}
     FOR     ${item}     IN      @{listOfTaxpayers}
@@ -20,11 +60,15 @@ Calculate Tax Relief
         ${item_natid}=      Get From Dictionary     ${item}     natid
 
         ${item_birthyear}=      Get Substring   ${item_birthday}    -4
-        ${item_age}=        Evaluate    2022-${item_birthyear}
+        ${item_age}=        Evaluate    2023-${item_birthyear}
 
         IF  "${item_gender}"=="M"
             ${gender_bonus}=    Set Variable    0
+        ELSE IF     "${item_gender}"=="m"
+            ${gender_bonus}=    Set Variable    0
         ELSE IF  "${item_gender}"=="F"
+            ${gender_bonus}=    Set Variable    500
+        ELSE IF  "${item_gender}"=="f"
             ${gender_bonus}=    Set Variable    500
         END
 
@@ -41,7 +85,7 @@ Calculate Tax Relief
         END
 
         ${Tax_Relief}=      Evaluate    int((((${item_salary}-${item_tax})*${age_variable})+${gender_bonus})*100)/100.0
-        ${Tax_Relief}=      Evaluate    round(${Tax_Relief})
+        ${Tax_Relief}=      Evaluate    "%.2f" %round(${Tax_Relief})
 
         IF  ${Tax_Relief}>0 and ${Tax_Relief}<50
             ${Tax_Relief}=  Set Variable    50
@@ -50,7 +94,7 @@ Calculate Tax Relief
         ${body_list2}=  Create Dictionary   name=${item_name}   natid=${item_natid}     tax_relief=${Tax_Relief}
         Append To List  ${secondList}    ${body_list2}
     END
-    
+
 Masking Natid and Validation
     [Arguments]     ${ListOfTaxrelief}      ${responsebody}
     FOR     ${item2}     IN      @{ListOfTaxrelief}
@@ -68,29 +112,24 @@ Masking Natid and Validation
         ${hidden_natid}=    Catenate    SEPARATOR=  ${visible_natid}    ${hidden_characters}
 
         ${item2_taxrelief_string}=  Convert To String    ${item2_taxrelief}
-        Should Contain    ${responsebody}    ${hidden_natid}
-        Should Contain    ${responsebody}     ${item2_taxrelief_string}
-        Should Contain    ${responsebody}     ${item2_name}
-        Log To Console    "Done"
+
+        ${responsebody_contents}=    Evaluate    json.loads('''${responsebody.content}''')    json
+        ${responsebody_content}=     Copy Dictionary    ${responsebody_contents}[0]
+
+        Should Be Equal    ${responsebody_content}[natid]    ${hidden_natid}    msg=${natid_error}
+        Should Be Equal    ${responsebody_content}[relief]     ${item2_taxrelief}     msg=${taxrelief_error}
+        Should Be Equal    ${responsebody_content}[name]     ${item2_name}     msg=${name_error}
     END
 
 *** Test Cases ***
-TC_02:Querying_Tax_Relief_Service_Gender
-    [Tags]  Functional  Smoke
-    Create Session    session    ${base_url}
-    ${list}=    Create List
-    ${list2}=   Create List
-    ${body1}=    Create Dictionary   birthday=17012003    gender=F   name=TesterA     natid=s12345678a     salary=8000     tax=2000
-    Append To List    ${list}   ${body1}
-    ${body2}=    Create Dictionary   birthday=17012003    gender=M   name=TesterB     natid=s23456789b     salary=8000     tax=2000
-    Append To List    ${list}   ${body2}
-
-    Calculate Tax Relief    ${list}     ${list2}
-
-    ${header}=      Create Dictionary   Content-Type=application/json
-    ${response}=    POST On Session    session    /calculator/insertMultiple  json=${list}    headers=${header}
-
-    ${response_taxrelief}=      Get On Session     session     /calculator/taxRelief
-    ${response_taxrelief_body}=     Convert To String    ${response_taxrelief.content}
-    
-    Masking Natid and Validation    ${list2}    ${response_taxrelief_body}
+Tax Relief Formula Gender Bonus
+    [Template]  Gender Bonus
+    --Testing for gender is character M   ${birthday}    M      ${name}    ${natid}   ${salary}  ${tax}     202
+    --Testing for gender is character F   ${birthday}    F      ${name}    ${natid}   ${salary}  ${tax}     202
+    --Testing for gender is character m   ${birthday}    m      ${name}    ${natid}   ${salary}  ${tax}     202
+    --Testing for gender is character f   ${birthday}    f      ${name}    ${natid}   ${salary}  ${tax}     202
+    --Testing for gender is invalid character T   ${birthday}    T      ${name}    ${natid}   ${salary}  ${tax}     500
+    --Testing for gender is string Male   ${birthday}    Male      ${name}    ${natid}   ${salary}  ${tax}     500
+    --Testing for gender is string Female   ${birthday}    Female      ${name}    ${natid}   ${salary}  ${tax}     500
+    --Testing for gender is digits   ${birthday}    1234567      ${name}    ${natid}   ${salary}  ${tax}     500
+    --Testing for gender is special characters   ${birthday}    !@#$%^&      ${name}    ${natid}   ${salary}  ${tax}     500
