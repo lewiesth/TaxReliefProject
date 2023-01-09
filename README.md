@@ -38,7 +38,7 @@ robot -e smoke .\OppenheimerUS1
 
 After running the test cases, you can review all the test cases ran in the log.html file under venv with Right-click -> Open in -> Browser -> Chrome
 
-To utilise allure reporting, run the allure-robot listener in conjunction with the robot commands above
+To utilise allure reporting, run the allure-robot listener in conjunction with the robot commands above. You need to have allure commandline application downloaded and your system variable PATH set to the downloaded .bin file to run allure. Step by step instructions can be found here https://docs.qameta.io/allure/
 
 ```
 
@@ -71,17 +71,11 @@ For the context of this project, having 10 threads calling each service 5 times 
 ### Logging
 Allure has been added into this project as a test report tool to support better user readability and make it more intuitive to understand test results. However, due to the nature of allure-robotframework, it can be clunky as the results can only be viewed when having the allure output files from running the test cases which can be in large numbers and difficult to share results between machines. It would be better if the reports could be stored and distributed as a standalone file, which could be possible with allure integration with docker containers.
 
-### TestData
-Currently, test data is being created manually and stored locally either within the codebase or on local machine. In an ideal scenario, I could create Python classes that could generate the data appropriately for both valid and invalid test cases on demand and remove the need to have test data stored in a disorderly manner
-
-### Test cleanup
-In many of the testcases, the validations and data manipulation would seem to be rather large chunks and repetitive. Given enough time, it would be good practise to store validations and formulas in keywords/classes to reduce the mess and keep the code more concise
-
 
 ## Packages and versions
 | Packages | Versions |
 | -------- | -------- |
-| robotframwork | 6.0.1 |
+| robotframework | 6.0.1 |
 | robotframework-requests | 0.9.4 |
 | robotframework-jsonlibrary | 0.5 |
 | robotframework-seleniumlibrary | 6.0.0 |
@@ -112,4 +106,6 @@ Portability - Run tests to check useability of testware on different platforms, 
 
 ![ResultsAllureSnapshot](https://user-images.githubusercontent.com/44538479/210918022-2a8a1fe4-0368-40f4-a216-3a23dc84a526.PNG)
 
-To explore the results further using allure reporting tool, ensure you have followed the instructions on running allure under the How to run section. Alternatively, you can download the allure report folder, and run index.html in the browser of your choice.
+To explore the results further using allure reporting tool, ensure you have followed the instructions on running allure under the How to run section. 
+
+Refer to Testing Documentation.xlsx for test charter details, including test description, test steps, input data and comments regarding test case failing
