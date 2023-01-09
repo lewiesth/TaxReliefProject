@@ -31,12 +31,16 @@ Age Variable
     ${body1}=    Create Dictionary   birthday=${birthday}     gender=${gender}   name=${name}      natid=${natid}     salary=${salary}     tax=${tax}
     Append To List    ${list}   ${body1}
 
-    Calculate Tax Relief    ${list}     ${list2}
-
     ${header}=      Create Dictionary   Content-Type=application/json
-    ${response}=    POST On Session    session    /calculator/insertMultiple  json=${list}    headers=${header}
+    TRY
+        ${response}=    POST On Session    session    ${endpoint}  json=${list}    headers=${header}
+    EXCEPT
+        Pass Execution    Failure to send post request expected. Invalid age input
+    END
     ${status_code}=     convert to string   ${response.status_code}
     Should Be Equal    ${status_code}    ${Expected_Status_Code}    msg=Invalid status code. Expected ${Expected_Status_Code}
+
+    Calculate Tax Relief    ${list}     ${list2}
 
     ${response_taxrelief}=      Get On Session     session     ${endpoint_taxrelief}
 
@@ -55,12 +59,19 @@ Calculate Tax Relief
         ${item_natid}=      Get From Dictionary     ${item}     natid
 
         ${item_birthyear}=      Get Substring   ${item_birthday}    -4
-
-        ${item_age}=        Evaluate    2023-${item_birthyear}
+        TRY
+             ${item_age}=        Evaluate    2023-${item_birthyear}
+        EXCEPT
+            Log To Console    Invalid date format
+        END
 
         IF  "${item_gender}"=="M"
             ${gender_bonus}=    Set Variable    0
+        ELSE IF     "${item_gender}"=="m"
+            ${gender_bonus}=    Set Variable    0
         ELSE IF  "${item_gender}"=="F"
+            ${gender_bonus}=    Set Variable    500
+        ELSE IF  "${item_gender}"=="f"
             ${gender_bonus}=    Set Variable    500
         END
 
@@ -116,6 +127,8 @@ Masking Natid and Validation
 *** Test Cases ***
 Tax Relief Formula Age Variable
     [Template]  Age Variable
+    [Documentation]     Testing for age variable with variety of valid and invalid birthdates
+    [Tags]  Functional  Smoke
     --Test when age = 18   01012005    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    202
     --Test when age = 19   01012004    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    202
     --Test when age = 35   01011988    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    202

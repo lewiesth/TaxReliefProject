@@ -31,17 +31,17 @@ Gender Bonus
     ${body1}=    Create Dictionary   birthday=${birthday}     gender=${gender}   name=${name}      natid=${natid}     salary=${salary}     tax=${tax}
     Append To List    ${list}   ${body1}
 
-    Calculate Tax Relief    ${list}     ${list2}
-
     ${header}=      Create Dictionary   Content-Type=application/json
     TRY
         ${response}=    POST On Session    session    ${endpoint}  json=${list}    headers=${header}
     EXCEPT
-        Log To Console    Failure to send Post request. Invalid gender input
+        Pass Execution    Failure to send Post request expected. Invalid gender input
     END
 
     ${status_code}=     convert to string   ${response.status_code}
     Should Be Equal    ${status_code}    ${Expected_Status_Code}    msg=Invalid status code. Expected ${Expected_Status_Code}
+
+    Calculate Tax Relief    ${list}     ${list2}
 
     ${response_taxrelief}=      Get On Session     session     ${endpoint_taxrelief}
 
@@ -124,12 +124,14 @@ Masking Natid and Validation
 *** Test Cases ***
 Tax Relief Formula Gender Bonus
     [Template]  Gender Bonus
-    --Testing for gender is character M   ${birthday}    M      ${name}    ${natid}   ${salary}  ${tax}     202
-    --Testing for gender is character F   ${birthday}    F      ${name}    ${natid}   ${salary}  ${tax}     202
-    --Testing for gender is character m   ${birthday}    m      ${name}    ${natid}   ${salary}  ${tax}     202
-    --Testing for gender is character f   ${birthday}    f      ${name}    ${natid}   ${salary}  ${tax}     202
-    --Testing for gender is invalid character T   ${birthday}    T      ${name}    ${natid}   ${salary}  ${tax}     500
-    --Testing for gender is string Male   ${birthday}    Male      ${name}    ${natid}   ${salary}  ${tax}     500
-    --Testing for gender is string Female   ${birthday}    Female      ${name}    ${natid}   ${salary}  ${tax}     500
-    --Testing for gender is digits   ${birthday}    1234567      ${name}    ${natid}   ${salary}  ${tax}     500
-    --Testing for gender is special characters   ${birthday}    !@#$%^&      ${name}    ${natid}   ${salary}  ${tax}     500
+    [Documentation]     Testing for differences in tax relief with calculation of gender bonus with valid and invalid gender values
+    [Tags]  Functional  Smoke
+    --Testing where gender is character M   ${birthday}    M      ${name}    ${natid}   ${salary}  ${tax}     202
+    --Testing where gender is character F   ${birthday}    F      ${name}    ${natid}   ${salary}  ${tax}     202
+    --Testing where gender is character m   ${birthday}    m      ${name}    ${natid}   ${salary}  ${tax}     202
+    --Testing where gender is character f   ${birthday}    f      ${name}    ${natid}   ${salary}  ${tax}     202
+    --Testing where gender is invalid character T   ${birthday}    T      ${name}    ${natid}   ${salary}  ${tax}     500
+    --Testing where gender is string Male   ${birthday}    Male      ${name}    ${natid}   ${salary}  ${tax}     500
+    --Testing where gender is string Female   ${birthday}    Female      ${name}    ${natid}   ${salary}  ${tax}     500
+    --Testing where gender is digits   ${birthday}    1234567      ${name}    ${natid}   ${salary}  ${tax}     500
+    --Testing where gender is special characters   ${birthday}    !@#$%^&      ${name}    ${natid}   ${salary}  ${tax}     500

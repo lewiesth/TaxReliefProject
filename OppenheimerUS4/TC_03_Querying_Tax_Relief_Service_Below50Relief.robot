@@ -59,7 +59,11 @@ Calculate Tax Relief
 
         IF  "${item_gender}"=="M"
             ${gender_bonus}=    Set Variable    0
+        ELSE IF     "${item_gender}"=="m"
+            ${gender_bonus}=    Set Variable    0
         ELSE IF  "${item_gender}"=="F"
+            ${gender_bonus}=    Set Variable    500
+        ELSE IF  "${item_gender}"=="f"
             ${gender_bonus}=    Set Variable    500
         END
 
@@ -115,9 +119,11 @@ Masking Natid and Validation
 *** Test Cases ***
 Tax Relief Formula Minimum Tax Relief
     [Template]  Minimum Tax Relief
+    [Documentation]     Testing for minimum tax relief of 50 with varying tax reliefs
+    [Tags]  Functional  Smoke
     --Testing for TaxRelief=0   ${birthday}    ${gender}      ${name}    ${natid}   ${salary}  10000     0.00  202
     --Testing for TaxRelief=1   ${birthday}    ${gender}      ${name}    ${natid}   ${salary}  9999    50.00    202
     --Testing for TaxRelief=49   ${birthday}    ${gender}      ${name}    ${natid}   ${salary}  9951     50.00  202
     --Testing for TaxRelief=50   ${birthday}    ${gender}      ${name}    ${natid}   ${salary}  9950    50.00   202
     --Testing for TaxRelief=51   ${birthday}    ${gender}      ${name}    ${natid}   ${salary}  9949    51.00   202
-    --Testing for TaxRelief is negative   ${birthday}    ${gender}      ${name}    ${natid}   ${salary}  10001    -1.00   500
+    --Testing where TaxRelief is negative   ${birthday}    ${gender}      ${name}    ${natid}   ${salary}  10001    -1.00   500

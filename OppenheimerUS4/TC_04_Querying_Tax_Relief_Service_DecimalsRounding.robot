@@ -61,7 +61,11 @@ Calculate Tax Relief
 
         IF  "${item_gender}"=="M"
             ${gender_bonus}=    Set Variable    0
+        ELSE IF     "${item_gender}"=="m"
+            ${gender_bonus}=    Set Variable    0
         ELSE IF  "${item_gender}"=="F"
+            ${gender_bonus}=    Set Variable    500
+        ELSE IF  "${item_gender}"=="f"
             ${gender_bonus}=    Set Variable    500
         END
 
@@ -77,7 +81,7 @@ Calculate Tax Relief
             ${age_variable}=    Set Variable    0.05
         END
 
-        ${Tax_Relief}=      Evaluate    int((((${item_salary}-${item_tax})*${age_variable})+${gender_bonus})*100)/100.0
+        ${Tax_Relief}=      Evaluate    int((((${item_salary}-${item_tax})*${age_variable})+${gender_bonus})*100)/100.00
         ${Tax_Relief}=      Evaluate    "%.2f" %round(${Tax_Relief})
 
         IF  ${Tax_Relief}>0 and ${Tax_Relief}<50
@@ -117,6 +121,8 @@ Masking Natid and Validation
 *** Test Cases ***
 Tax Relief Formula Decimal Rounding
     [Template]  Decimal Rounding
+    [Documentation]     Testing for rounding of tax relief values for both rounding up and down
+    [Tags]  Functional  Smoke
     --Testing for relief with decimal .00   ${birthday}    ${gender}      ${name}    ${natid}   ${salary}  9900     ${status_code_valid}
     --Testing for relief with decimal .01   ${birthday}    ${gender}      ${name}    ${natid}   ${salary}  9899.99     ${status_code_valid}
     --Testing for relief with decimal .26   ${birthday}    ${gender}      ${name}    ${natid}   ${salary}  9899.74     ${status_code_valid}
