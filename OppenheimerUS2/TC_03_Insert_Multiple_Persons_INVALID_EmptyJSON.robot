@@ -1,12 +1,9 @@
 *** Settings ***
 Library     RequestsLibrary
 Library     Collections
+Resource    ${CURDIR}/../common.robot
 
-
-Test Teardown   POST On Session     session     /calculator/rakeDatabase
-
-*** Variables ***
-${base_url}=    http://localhost:8080
+Test Teardown   POST On Session     session     ${teardown_rake}
 
 *** Test Cases ***
 TC_03:Insert_Multiple_Persons_INVALID_EmptyJSON
@@ -15,9 +12,9 @@ TC_03:Insert_Multiple_Persons_INVALID_EmptyJSON
     ${list}=    Create List
     ${body1}=    Create Dictionary
     Append To List    ${list}   ${body1}
-    ${header}=      Create Dictionary   Content-Type=application/json
-    ${response}=    POST On Session    session    /calculator/insertMultiple  json=${list}    headers=${header}     expected_status=500
+    ${header}=      Create Dictionary   Content-Type=${content_type_json}
+    ${response}=    POST On Session    session    ${endpoint_insertMultiple}  json=${list}    headers=${header}     expected_status=${status_code_invalid}
 
     #Validations
     ${status_code}=     convert to string   ${response.status_code}
-    Should Be Equal    ${status_code}    500
+    Should Be Equal    ${status_code}    ${status_code_invalid}

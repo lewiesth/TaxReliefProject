@@ -3,24 +3,9 @@ Library     RequestsLibrary
 Library     Collections
 Library     String
 Library    SeleniumLibrary
+Resource    ${CURDIR}/../common.robot
 
-Test Teardown   POST On Session     session     /calculator/rakeDatabase
-
-*** Variables ***
-${base_url}=    http://localhost:8080
-${endpoint}=    /calculator/insertMultiple
-${endpoint_taxrelief}=  /calculator/taxRelief
-${teardown_rake}=   /calculator/rakeDatabase
-
-#${birthday}=  01012007
-${gender}=  M
-${name}=    Lewies
-${natid}=   s1234567a
-${salary}=  10000
-${tax}=     1000
-${natid_error}=     Natid has failed validation
-${taxrelief_error}=    TaxRelief has failed validation
-${name_error}=      Name has failed validation
+Test Teardown   POST On Session     session     ${teardown_rake}
 
 *** Keywords ***
 Age Variable
@@ -31,9 +16,9 @@ Age Variable
     ${body1}=    Create Dictionary   birthday=${birthday}     gender=${gender}   name=${name}      natid=${natid}     salary=${salary}     tax=${tax}
     Append To List    ${list}   ${body1}
 
-    ${header}=      Create Dictionary   Content-Type=application/json
+    ${header}=      Create Dictionary   Content-Type=${content_type_json}
     TRY
-        ${response}=    POST On Session    session    ${endpoint}  json=${list}    headers=${header}
+        ${response}=    POST On Session    session    ${endpoint_insertMultiple}  json=${list}    headers=${header}
     EXCEPT
         Pass Execution    Failure to send post request expected. Invalid age input
     END
@@ -129,17 +114,17 @@ Tax Relief Formula Age Variable
     [Template]  Age Variable
     [Documentation]     Testing for age variable with variety of valid and invalid birthdates
     [Tags]  Functional  Smoke
-    --Test when age = 18   01012005    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    202
-    --Test when age = 19   01012004    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    202
-    --Test when age = 35   01011988    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    202
-    --Test when age = 36   01011987    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    202
-    --Test when age = 50   01011973    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    202
-    --Test when age = 51   01011972    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    202
-    --Test when age = 75   01011948    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    202
-    --Test when age = 76   01011947    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    202
-    --Test when age = 1   01012022    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    500
-    --Test when age = -1   01012024    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    500
-    --Test when age = 150   01011873    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    500
-    --Test when age is characters   abcdef    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    500
-    --Test when age is special characters   !@#$%^    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    500
-    --Test when age format is invalid   20050101    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    500
+    --Test when age = 18   01012005    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    ${status_code_valid}
+    --Test when age = 19   01012004    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    ${status_code_valid}
+    --Test when age = 35   01011988    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    ${status_code_valid}
+    --Test when age = 36   01011987    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    ${status_code_valid}
+    --Test when age = 50   01011973    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    ${status_code_valid}
+    --Test when age = 51   01011972    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    ${status_code_valid}
+    --Test when age = 75   01011948    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    ${status_code_valid}
+    --Test when age = 76   01011947    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    ${status_code_valid}
+    --Test when age = 1   01012022    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    ${status_code_invalid}
+    --Test when age = -1   01012024    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    ${status_code_invalid}
+    --Test when age = 150   01011873    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    ${status_code_invalid}
+    --Test when age is characters   abcdef    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    ${status_code_invalid}
+    --Test when age is special characters   !@#$%^    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    ${status_code_invalid}
+    --Test when age format is invalid   20050101    ${gender}      ${name}    ${natid}   ${salary}  ${tax}    ${status_code_invalid}

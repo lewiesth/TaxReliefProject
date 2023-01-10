@@ -2,22 +2,20 @@
 Library     RequestsLibrary
 Library     Collections
 Library     SeleniumLibrary
+Resource    ${CURDIR}/../common.robot
 
 Test Teardown   Run Keyword     Teardown
 
-*** Variables ***
-${base_url}=    http://localhost:8080
-
 *** Keywords ***
 Teardown
-    POST On Session     session     /calculator/rakeDatabase
+    POST On Session     session     ${teardown_rake}
     Close Browser
 
 *** Test Cases ***
 TC_09_1:Upload_Files_INVALID_MissingNatidChrome
     [Tags]  Functional  Portability-C
     Create Session    session    ${base_url}
-    Open Browser    http://localhost:8080/     Chrome
+    Open Browser    ${base_url}     ${driver_chrome}
     Wait Until Element Is Visible    xpath:/html/body/div/div[2]/div/div[1]/div[2]      timeout=5
     Choose File    xpath:/html/body/div/div[2]/div/div[1]/div[2]/input    C:/Users/ECQ1046/PycharmProjects/TaxReliefProject/OppenheimerUS3/TestData/InputDataInvalidMissingNatid.csv
     Click Button    xpath:/html/body/div/div[2]/div/button[1]
@@ -29,7 +27,7 @@ TC_09_1:Upload_Files_INVALID_MissingNatidChrome
 TC_09_2:Upload_Files_INVALID_MissingNatidFirefox
     [Tags]  Functional  Portability-FF
     Create Session    session    ${base_url}
-    Open Browser    http://localhost:8080/     Firefox
+    Open Browser    ${base_url}     ${driver_firefox}
     Wait Until Element Is Visible    xpath:/html/body/div/div[2]/div/div[1]/div[2]      timeout=5
     Choose File    xpath:/html/body/div/div[2]/div/div[1]/div[2]/input    C:\\Users\\ECQ1046\\PycharmProjects\\TaxReliefProject\\OppenheimerUS3\\TestData\\InputDataInvalidMissingNatid.csv
     Click Button    xpath:/html/body/div/div[2]/div/button[1]
@@ -41,7 +39,7 @@ TC_09_2:Upload_Files_INVALID_MissingNatidFirefox
 TC_09_3:Upload_Files_INVALID_MissingNatidEdge
     [Tags]  Functional  Portability-E
     Create Session    session    ${base_url}
-    Open Browser    http://localhost:8080/     edge
+    Open Browser    ${base_url}     ${driver_edge}
     Wait Until Element Is Visible    xpath:/html/body/div/div[2]/div/div[1]/div[2]      timeout=5
     Choose File    xpath:/html/body/div/div[2]/div/div[1]/div[2]/input    C:/Users/ECQ1046/PycharmProjects/TaxReliefProject/OppenheimerUS3/TestData/InputDataInvalidMissingNatid.csv
     Click Button    xpath:/html/body/div/div[2]/div/button[1]

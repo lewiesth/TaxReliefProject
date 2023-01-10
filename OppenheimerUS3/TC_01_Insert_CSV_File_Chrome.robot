@@ -2,16 +2,13 @@
 Library     RequestsLibrary
 Library     Collections
 Library     SeleniumLibrary
-
+Resource    ${CURDIR}/../common.robot
 
 Test Teardown   Run Keyword     Teardown
 
-*** Variables ***
-${base_url}=    http://localhost:8080
-
 *** Keywords ***
 Teardown
-    POST On Session     session     /calculator/rakeDatabase
+    POST On Session     session     ${teardown_rake}
     Close Browser
 
 *** Test Cases ***
@@ -19,7 +16,7 @@ TC_01:Upload_Files_Via_Chrome
     [Documentation]     The tests in this directory are to validate that the file upload via the website http://localhost:8080/ is able to load the data onto the table properly
     [Tags]  Functional  Portability-C   Smoke
     Create Session    session    ${base_url}
-    Open Browser    http://localhost:8080/     Chrome
+    Open Browser    ${base_url}     ${driver_chrome}
     Wait Until Element Is Visible    xpath:/html/body/div/div[2]/div/div[1]/div[2]      timeout=5
     Choose File    xpath:/html/body/div/div[2]/div/div[1]/div[2]/input    C:/Users/ECQ1046/PycharmProjects/TaxReliefProject/OppenheimerUS3/TestData/InputDataValid.csv
     Click Button    xpath:/html/body/div/div[2]/div/button[1]

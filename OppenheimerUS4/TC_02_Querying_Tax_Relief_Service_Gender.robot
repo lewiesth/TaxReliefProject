@@ -3,24 +3,9 @@ Library     RequestsLibrary
 Library     Collections
 Library     String
 Library    SeleniumLibrary
+Resource    ${CURDIR}/../common.robot
 
-Test Teardown   POST On Session     session     /calculator/rakeDatabase
-
-*** Variables ***
-${base_url}=    http://localhost:8080
-${endpoint}=    /calculator/insertMultiple
-${endpoint_taxrelief}=  /calculator/taxRelief
-${teardown_rake}=   /calculator/rakeDatabase
-
-${birthday}=  01012007
-#${gender}=  M
-${name}=    Lewies
-${natid}=   s1234567a
-${salary}=  10000
-${tax}=     1000
-${natid_error}=     Natid has failed validation
-${taxrelief_error}=    TaxRelief has failed validation
-${name_error}=      Name has failed validation
+Test Teardown   POST On Session     session     ${teardown_rake}
 
 *** Keywords ***
 Gender Bonus
@@ -31,9 +16,9 @@ Gender Bonus
     ${body1}=    Create Dictionary   birthday=${birthday}     gender=${gender}   name=${name}      natid=${natid}     salary=${salary}     tax=${tax}
     Append To List    ${list}   ${body1}
 
-    ${header}=      Create Dictionary   Content-Type=application/json
+    ${header}=      Create Dictionary   Content-Type=${content_type_json}
     TRY
-        ${response}=    POST On Session    session    ${endpoint}  json=${list}    headers=${header}
+        ${response}=    POST On Session    session    ${endpoint_insertMultiple}  json=${list}    headers=${header}
     EXCEPT
         Pass Execution    Failure to send Post request expected. Invalid gender input
     END
@@ -126,12 +111,12 @@ Tax Relief Formula Gender Bonus
     [Template]  Gender Bonus
     [Documentation]     Testing for differences in tax relief with calculation of gender bonus with valid and invalid gender values
     [Tags]  Functional  Smoke
-    --Testing where gender is character M   ${birthday}    M      ${name}    ${natid}   ${salary}  ${tax}     202
-    --Testing where gender is character F   ${birthday}    F      ${name}    ${natid}   ${salary}  ${tax}     202
-    --Testing where gender is character m   ${birthday}    m      ${name}    ${natid}   ${salary}  ${tax}     202
-    --Testing where gender is character f   ${birthday}    f      ${name}    ${natid}   ${salary}  ${tax}     202
-    --Testing where gender is invalid character T   ${birthday}    T      ${name}    ${natid}   ${salary}  ${tax}     500
-    --Testing where gender is string Male   ${birthday}    Male      ${name}    ${natid}   ${salary}  ${tax}     500
-    --Testing where gender is string Female   ${birthday}    Female      ${name}    ${natid}   ${salary}  ${tax}     500
-    --Testing where gender is digits   ${birthday}    1234567      ${name}    ${natid}   ${salary}  ${tax}     500
-    --Testing where gender is special characters   ${birthday}    !@#$%^&      ${name}    ${natid}   ${salary}  ${tax}     500
+    --Testing where gender is character M   ${birthday}    M      ${name}    ${natid}   ${salary}  ${tax}     ${status_code_valid}
+    --Testing where gender is character F   ${birthday}    F      ${name}    ${natid}   ${salary}  ${tax}     ${status_code_valid}
+    --Testing where gender is character m   ${birthday}    m      ${name}    ${natid}   ${salary}  ${tax}     ${status_code_valid}
+    --Testing where gender is character f   ${birthday}    f      ${name}    ${natid}   ${salary}  ${tax}     ${status_code_valid}
+    --Testing where gender is invalid character T   ${birthday}    T      ${name}    ${natid}   ${salary}  ${tax}     ${status_code_invalid}
+    --Testing where gender is string Male   ${birthday}    Male      ${name}    ${natid}   ${salary}  ${tax}     ${status_code_invalid}
+    --Testing where gender is string Female   ${birthday}    Female      ${name}    ${natid}   ${salary}  ${tax}     ${status_code_invalid}
+    --Testing where gender is digits   ${birthday}    1234567      ${name}    ${natid}   ${salary}  ${tax}     ${status_code_invalid}
+    --Testing where gender is special characters   ${birthday}    !@#$%^&      ${name}    ${natid}   ${salary}  ${tax}     ${status_code_invalid}

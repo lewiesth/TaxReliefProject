@@ -2,11 +2,9 @@
 Library     RequestsLibrary
 Library     Collections
 Library     SeleniumLibrary
+Resource    ${CURDIR}/../common.robot
 
 Test Teardown   Run Keyword     Teardown
-
-*** Variables ***
-${base_url}=    http://localhost:8080
 
 *** Keywords ***
 Teardown
@@ -17,7 +15,7 @@ Teardown
 TC_06_1:Upload_Files_INVALID_PdfFormatChrome
     [Tags]  Functional  Portability-C
     Create Session    session    ${base_url}
-    Open Browser    http://localhost:8080/     Chrome
+    Open Browser    ${base_url}     ${driver_chrome}
     Wait Until Element Is Visible    xpath:/html/body/div/div[2]/div/div[1]/div[2]      timeout=5
     Choose File    xpath:/html/body/div/div[2]/div/div[1]/div[2]/input    C:/Users/ECQ1046/PycharmProjects/TaxReliefProject/OppenheimerUS3/TestData/InputDataValid.pdf
     Click Button    xpath:/html/body/div/div[2]/div/button[1]
@@ -29,7 +27,7 @@ TC_06_1:Upload_Files_INVALID_PdfFormatChrome
 TC_06_2:Upload_Files_INVALID_PdfFormatFirefox
     [Tags]  Functional  Portability-FF
     Create Session    session    ${base_url}
-    Open Browser    http://localhost:8080/     Firefox
+    Open Browser    ${base_url}     ${driver_firefox}
     Wait Until Element Is Visible    xpath:/html/body/div/div[2]/div/div[1]/div[2]      timeout=5
     Choose File    xpath:/html/body/div/div[2]/div/div[1]/div[2]/input    C:\\Users\\ECQ1046\\PycharmProjects\\TaxReliefProject\\OppenheimerUS3\\TestData\\InputDataValid.pdf
     Click Button    xpath:/html/body/div/div[2]/div/button[1]
@@ -41,7 +39,7 @@ TC_06_2:Upload_Files_INVALID_PdfFormatFirefox
 TC_06_3:Upload_Files_INVALID_PdfFormatEdge
     [Tags]  Functional  Portability-E
     Create Session    session    ${base_url}
-    Open Browser    http://localhost:8080/     edge
+    Open Browser    ${base_url}     ${driver_edge}
     Wait Until Element Is Visible    xpath:/html/body/div/div[2]/div/div[1]/div[2]      timeout=5
     Choose File    xpath:/html/body/div/div[2]/div/div[1]/div[2]/input    C:/Users/ECQ1046/PycharmProjects/TaxReliefProject/OppenheimerUS3/TestData/InputDataValid.pdf
     Click Button    xpath:/html/body/div/div[2]/div/button[1]

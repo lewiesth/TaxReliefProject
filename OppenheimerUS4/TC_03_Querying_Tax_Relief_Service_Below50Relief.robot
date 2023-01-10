@@ -2,24 +2,9 @@
 Library     RequestsLibrary
 Library     Collections
 Library     String
+Resource    ${CURDIR}/../common.robot
 
-Test Teardown   POST On Session     session     /calculator/rakeDatabase
-
-*** Variables ***
-${base_url}=    http://localhost:8080
-${endpoint}=    /calculator/insertMultiple
-${endpoint_taxrelief}=  /calculator/taxRelief
-${teardown_rake}=   /calculator/rakeDatabase
-
-${birthday}=  01012007
-${gender}=  M
-${name}=    Lewies
-${natid}=   s1234567a
-${salary}=  10000
-#${tax}=     1000
-${natid_error}=     Natid has failed validation
-${taxrelief_error}=    TaxRelief has failed validation
-${name_error}=      Name has failed validation
+Test Teardown   POST On Session     session     ${teardown_rake}
 
 *** Keywords ***
 Minimum Tax Relief
@@ -32,8 +17,8 @@ Minimum Tax Relief
 
     Calculate Tax Relief    ${list}     ${list2}
 
-    ${header}=      Create Dictionary   Content-Type=application/json
-    ${response}=    POST On Session    session    ${endpoint}  json=${list}    headers=${header}
+    ${header}=      Create Dictionary   Content-Type=${content_type_json}
+    ${response}=    POST On Session    session    ${endpoint_insertMultiple}  json=${list}    headers=${header}
 
     ${status_code}=     convert to string   ${response.status_code}
     Should Be Equal    ${status_code}    ${Expected_Status_Code}    msg=Invalid status code. Expected ${Expected_Status_Code}
@@ -55,7 +40,7 @@ Calculate Tax Relief
         ${item_natid}=      Get From Dictionary     ${item}     natid
 
         ${item_birthyear}=      Get Substring   ${item_birthday}    -4
-        ${item_age}=        Evaluate    2022-${item_birthyear}
+        ${item_age}=        Evaluate    2023-${item_birthyear}
 
         IF  "${item_gender}"=="M"
             ${gender_bonus}=    Set Variable    0
@@ -121,9 +106,9 @@ Tax Relief Formula Minimum Tax Relief
     [Template]  Minimum Tax Relief
     [Documentation]     Testing for minimum tax relief of 50 with varying tax reliefs
     [Tags]  Functional  Smoke
-    --Testing for TaxRelief=0   ${birthday}    ${gender}      ${name}    ${natid}   ${salary}  10000     0.00  202
-    --Testing for TaxRelief=1   ${birthday}    ${gender}      ${name}    ${natid}   ${salary}  9999    50.00    202
-    --Testing for TaxRelief=49   ${birthday}    ${gender}      ${name}    ${natid}   ${salary}  9951     50.00  202
-    --Testing for TaxRelief=50   ${birthday}    ${gender}      ${name}    ${natid}   ${salary}  9950    50.00   202
-    --Testing for TaxRelief=51   ${birthday}    ${gender}      ${name}    ${natid}   ${salary}  9949    51.00   202
-    --Testing where TaxRelief is negative   ${birthday}    ${gender}      ${name}    ${natid}   ${salary}  10001    -1.00   500
+    --Testing for TaxRelief=0   ${birthday}    ${gender}      ${name}    ${natid}   ${salary}  10000     0.00  ${status_code_valid}
+    --Testing for TaxRelief=1   ${birthday}    ${gender}      ${name}    ${natid}   ${salary}  9999    50.00    ${status_code_valid}
+    --Testing for TaxRelief=49   ${birthday}    ${gender}      ${name}    ${natid}   ${salary}  9951     50.00  ${status_code_valid}
+    --Testing for TaxRelief=50   ${birthday}    ${gender}      ${name}    ${natid}   ${salary}  9950    50.00   ${status_code_valid}
+    --Testing for TaxRelief=51   ${birthday}    ${gender}      ${name}    ${natid}   ${salary}  9949    51.00   ${status_code_valid}
+    --Testing where TaxRelief is negative   ${birthday}    ${gender}      ${name}    ${natid}   ${salary}  10001    -1.00   ${status_code_invalid}

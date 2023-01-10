@@ -4,23 +4,20 @@ Library     Collections
 Library     SeleniumLibrary
 Library    String
 Library    XML
-
+Resource    ${CURDIR}/../common.robot
 
 Test Teardown   Run Keyword     Teardown
 
-*** Variables ***
-${base_url}=    http://localhost:8080
-
 *** Keywords ***
 Teardown
-    POST On Session     session     /calculator/rakeDatabase
+    POST On Session     session     ${teardown_rake}
     Close Browser
 
 *** Test Cases ***
 TC_03:Dispense_Button_CheckColorEdge
     [Tags]  Functional  Smoke   Portability-E
     Create Session    session    ${base_url}
-    Open Browser    http://localhost:8080/     edge
+    Open Browser    ${base_url}     ${driver_edge}
     Wait Until Element Is Visible    xpath:/html/body/div/div[2]/div/a[2]      timeout=5
     ${button_element}=  Get WebElement   xpath=/html/body/div/div[2]/div/a[2]
     ${button_color}=    Call Method    ${button_element}    value_of_css_property   background-color

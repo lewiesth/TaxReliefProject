@@ -4,16 +4,14 @@ Library     Collections
 Library     SeleniumLibrary
 Library    String
 Library    XML
+Resource    ${CURDIR}/../common.robot
 
 
 Test Teardown   Run Keyword     Teardown
 
-*** Variables ***
-${base_url}=    http://localhost:8080
-
 *** Keywords ***
 Teardown
-    POST On Session     session     /calculator/rakeDatabase
+    POST On Session     session     ${teardown_rake}
     Close Browser
 
 *** Test Cases ***
@@ -21,7 +19,7 @@ TC_01:Dispense_Button_CheckColorChrome
     [Documentation]     The tests in this directory are to validate that the 'Disense Now' button on the website http://localhost:8080/ is appropriately red, has text 'Dispense Now' and routes to a website with text 'Cash dispensed' visible
     [Tags]  Functional  Smoke   Portability-C
     Create Session    session    ${base_url}
-    Open Browser    http://localhost:8080/     Chrome
+    Open Browser    ${base_url}     ${driver_chrome}
     Wait Until Element Is Visible    xpath:/html/body/div/div[2]/div/a[2]      timeout=5
     ${button_element}=  Get WebElement   xpath=/html/body/div/div[2]/div/a[2]
     ${button_color}=    Call Method    ${button_element}    value_of_css_property   background-color

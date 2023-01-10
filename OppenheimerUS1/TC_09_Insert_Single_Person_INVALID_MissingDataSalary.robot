@@ -1,21 +1,18 @@
 *** Settings ***
 Library     RequestsLibrary
 Library     Collections
+Resource    ${CURDIR}/../common.robot
 
-Test Teardown   POST On Session     session     /calculator/rakeDatabase
-
-*** Variables ***
-${base_url}=    http://localhost:8080
-
+Test Teardown   POST On Session     session     ${teardown_rake}
 
 *** Test Cases ***
 TC_09:Insert_Single_Person_INVALID_MissingDataSalary
     [Tags]  Functional
     Create Session    session    ${base_url}
-    ${body}=    Create Dictionary   birthday=17061995    gender=M   name=Lewies     natid=s9520789h     tax=300
-    ${header}=      Create Dictionary   Content-Type=application/json
-    ${response}=    POST On Session    session    /calculator/insert  json=${body}    headers=${header}     expected_status=500
+    ${body}=    Create Dictionary   birthday=${birthday}    gender=${gender}   name=${name}     natid=${natid}     tax=${tax}
+    ${header}=      Create Dictionary   Content-Type=${content_type_json}
+    ${response}=    POST On Session    session    ${endpoint_insert}  json=${body}    headers=${header}     expected_status=${status_code_invalid}
 
     #Validations
     ${status_code}=     convert to string   ${response.status_code}
-    Should Be Equal    ${status_code}    500
+    Should Be Equal    ${status_code}    ${status_code_invalid}
